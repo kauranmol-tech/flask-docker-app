@@ -1,0 +1,26 @@
+name: Flask Docker CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Create .env file
+        run: |
+          echo "APP_MESSAGE=${{ secrets.APP_MESSAGE }}" >> .env
+          echo "APP_HEALTH=${{ secrets.APP_HEALTH }}" >> .env
+
+      - name: Confirm .env file exists
+        run: cat .env
+
+      - name: Build Docker image
+        run: docker build -t flask-app .
+
+      - name: Run container
+        run: docker run -d -p 5000:5000 --env-file .env flask-app
